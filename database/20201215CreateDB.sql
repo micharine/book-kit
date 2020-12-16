@@ -17,6 +17,7 @@ CREATE TABLE `bookkit_dev`.`order` (
   `inventoryItemCode` CHAR(255) NULL,
   `quantityOrdered` INT NULL,
   `customerID` CHAR(255) NULL,
+  `transactionID` CHAR(255) NULL,
   `createdAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ,
   `updatedAt` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`));
