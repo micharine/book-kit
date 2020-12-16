@@ -66,7 +66,7 @@ const queryDB = (req, sql, args) => new Promise((resolve, reject) => {
 });
 
 const root = {
-  getInventory: (args, req) => queryDB(req, "select * from inventoryitem").then(data => data),
+  getInventoryItems: (args, req) => queryDB(req, "select * from inventoryitem").then(data => data),
   getInventoryItemInfo: (args, req) => queryDB(req, "select * from inventoryitem where id = ?", [args.id]).then(data => data[0]),
   updateInventoryItemQuantity: (args, req) => queryDB(req, "update inventoryitem SET ? where id = ?", [args, args.id]).then(data => data),
   createOrder: (args, req) => queryDB(req, "insert into order SET ?", args).then(data => data),
