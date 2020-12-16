@@ -37,7 +37,7 @@ To test this locally after cloning,
 }
 ```
 ### Update the quantity available in the inventory item list
-This mutation will update the quantityInStock for the inventory with id = 5 to be 5.
+This mutation will update the quantityInStock for the inventory item with id = 5 to be 5.
 ```
 mutation {updateInventoryItemQuantity(id: 5 quantityInStock: 5)}
 ```
