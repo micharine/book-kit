@@ -7,7 +7,8 @@ const mysql = require('mysql');
 const configurator = require('./local');
 let config = configurator.config;
 
-// separate file later and export/import?
+// TODO: separate file later and export/import?
+// Make id's id: Int! or !Int? Or something.. Make them required?
 
 const storeSchema = buildSchema(`
   type InventoryItem {
@@ -57,6 +58,7 @@ app.use((req, res, next) => {
     next();
 });
 
+// TODO: consider async/await here
 const queryDB = (req, sql, args) => new Promise((resolve, reject) => {
     req.mysqlDb.query(sql, args, (err, rows) => {
         if (err)
@@ -70,7 +72,7 @@ const root = {
   getInventoryItemInfo: (args, req) => queryDB(req, "select * from inventoryitem where id = ?", [args.id]).then(data => data[0]),
   updateInventoryItemQuantity: (args, req) => queryDB(req, "update inventoryitem SET ? where id = ?", [args, args.id]).then(data => data),
   createOrder: (args, req) => queryDB(req, "insert into order SET ?", args).then(data => data),
-//   deleteUser: (args, req) => queryDB(req, "delete from users where id = ?", [args.id]).then(data => data)
+//   deleteInventoryItem: (args, req) => queryDB(req, "delete from inventoryitem where id = ?", [args.id]).then(data => data)
 };
 
 // Connect graphQL
