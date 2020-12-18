@@ -2,10 +2,16 @@ const express = require('express');
 const { graphqlHTTP } = require('express-graphql');
 const { graphql, buildSchema } = require('graphql');
 const mysql = require('mysql');
+const Stripe = require('stripe');
 const cors = require('cors')
 
 const configurator = require('./local');
 let config = configurator.config;
+
+
+// stripe
+const stripe = Stripe(config.stripe.secretkey);
+
 
 // TODO: separate file later and export/import?
 // Make id's id: Int! or !Int? Or something.. Make them required?
@@ -47,9 +53,9 @@ app.use(cors());
 app.use((req, res, next) => {
     req.mysqlDb = mysql.createConnection({
         // host: config.host,
-        user: config.user,
-        password: config.password,
-        database: config.database,
+        user: config.db.user,
+        password: config.db.password,
+        database: config.db.database,
         // port: config.port,
         // insecureAuth : true
     });
@@ -86,6 +92,28 @@ app.use('/graphql', graphqlHTTP({
 app.get('/', (req, res) => {
     res.send(`Hello World!`);
 });
+
+// Stripe payment intent endpoint
+app.post('/create-payment-intent', async(req, res)=>{
+  let {items, currency} = req.body;
+  // TODO: may hardcode currency to 'usd'
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: calculateOrderAmount(items),
+    currency: currency,
+    // Verify integration
+    metadata: {integration_check: 'accept_a_payment'},
+  });
+  
+  // Send publishable key and paymentIntent details to client
+  // TODO: may not need publishable key
+res.send({
+  publishableKey: config.stripe.secretkey,
+  clientSecret: paymentIntent.client_secret
+});
+
+});
+
+
 let port = 4000;
 app.listen(port);
 console.log(`Running GraphQL server at localhost:${port}.`);
