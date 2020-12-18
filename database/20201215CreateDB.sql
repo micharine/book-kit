@@ -4,7 +4,7 @@ CREATE TABLE `bookkit_dev`.`inventoryitem` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` CHAR(255) NULL,
   `description` CHAR(255) NULL,
-  `cost` DECIMAL NULL,
+  `cost` DECIMAL(10,2) NULL,
   `code` CHAR(255) NULL,
   `quantityInStock` INT NULL,
   `createdAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ,
