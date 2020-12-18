@@ -2,7 +2,7 @@ const express = require('express');
 const { graphqlHTTP } = require('express-graphql');
 const { graphql, buildSchema } = require('graphql');
 const mysql = require('mysql');
-// const cors = require('cors')
+const cors = require('cors')
 
 const configurator = require('./local');
 let config = configurator.config;
@@ -41,7 +41,7 @@ const storeSchema = buildSchema(`
 // Standup
 let app = express();
 
-// app.use(cors());
+app.use(cors());
 
 /* Establish Database Connection */
 app.use((req, res, next) => {
