@@ -93,6 +93,17 @@ app.get('/', (req, res) => {
     res.send(`Hello World!`);
 });
 
+// items = [{id, cost, quantityOrdered, code},{},...]
+let calculateOrderAmount = (items)=>{
+let amount = 0;
+  items.map((item)=>{
+  let cost = item.cost;
+  let quantity = item.quantityOrdered;
+  amount += (cost*quantity);
+});
+return amount;
+};
+
 // Stripe payment intent endpoint
 app.post('/create-payment-intent', async(req, res)=>{
   let {items, currency} = req.body;
