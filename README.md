@@ -42,3 +42,14 @@ This mutation will update the quantityInStock for the inventory item with id = 5
 mutation {updateInventoryItemQuantity(id: 5 quantityInStock: 5)}
 ```
 ### Create an order
+
+```
+mutation{
+  createOrder(
+    inventoryItemCode: "gen"
+    quantityOrdered: 1
+    customerID: "TestCustomer"
+    transactionID:"PK_12378"
+  )
+}
+```

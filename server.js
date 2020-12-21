@@ -13,36 +13,6 @@ let config = configurator.config;
 // stripe
 const stripe = Stripe(config.stripe.secretkey);
 
-// TODO: separate file later and export/import?
-// Make id's id: Int! or !Int? Or something.. Make them required?
-
-const storeSchema = buildSchema(`
-  type InventoryItem {
-    id: Int
-    name: String
-    description: String
-    cost: Float
-    code: String
-    quantityInStock: Int
-  }
-  type Order {
-    id: Int
-    name: String
-    description: String
-    cost: Float
-    code: String
-    quantityInStock: Int
-  }
-  type Query {
-    getInventoryItems: [InventoryItem],
-    getInventoryItemInfo(id: Int) : InventoryItem
-  }
-  type Mutation {
-    updateInventoryItemQuantity(id: Int, quantityInStock: Int) : Boolean
-    createOrder(inventoryItemCode: String, quantityOrdered: Int, customerID: String, transactionID: String) : Boolean
-  }
-`);
-
 // Standup
 let app = express();
 
@@ -75,6 +45,36 @@ const queryDB = (req, sql, args) =>
         });
     });
 
+    // TODO: separate file later and export/import?
+
+const storeSchema = buildSchema(`
+type InventoryItem {
+  id: Int!
+  name: String
+  description: String
+  cost: Float
+  code: String
+  quantityInStock: Int
+}
+type Order {
+  id: Int!
+  transactionID: String!
+  inventoryItemCode: String
+  quantityOrdered: Int
+  email: String
+  firstName: String
+  lastName: String
+}
+type Query {
+  getInventoryItems: [InventoryItem],
+  getInventoryItemInfo(id: Int) : InventoryItem
+}
+type Mutation {
+  updateInventoryItemQuantity(id: Int, quantityInStock: Int) : Boolean
+  createOrder(inventoryItemCode: String, quantityOrdered: Int, email: String, firstName: String, lastName: String, transactionID: String) : Boolean
+}
+`);
+
 const root = {
     getInventoryItems: (args, req) =>
         queryDB(req, 'select * from inventoryitem').then((data) => data),
@@ -87,8 +87,8 @@ const root = {
             args,
             args.id,
         ]).then((data) => data),
-    createOrder: (args, req) =>
-        queryDB(req, 'insert into order SET ?', args).then((data) => data),
+    createOrder: (args, req) =>{
+        queryDB(req, 'insert into purchase SET ?', args).then((data) => data)},
     //   deleteInventoryItem: (args, req) => queryDB(req, "delete from inventoryitem where id = ?", [args.id]).then(data => data)
 };
 
@@ -146,4 +146,4 @@ app.post('/create-payment-intent', upload.array(), async (req, res) => {
 
 let port = 4000;
 app.listen(port);
-console.log(`Running GraphQL server at localhost:${port}.`);
+console.log(`Running GraphQL server at http://localhost:${port}/graphql.`);

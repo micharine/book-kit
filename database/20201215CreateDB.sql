@@ -12,11 +12,13 @@ CREATE TABLE `bookkit_dev`.`inventoryitem` (
   PRIMARY KEY (`id`));
 
 -- Order Table
-CREATE TABLE `bookkit_dev`.`order` (
+CREATE TABLE `bookkit_dev`.`purchase` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `inventoryItemCode` CHAR(255) NULL,
   `quantityOrdered` INT NULL,
-  `customerID` CHAR(255) NULL,
+  `email` CHAR(255) NULL,
+  `firstName` CHAR(255) NULL,
+  `lastName` CHAR(255) NULL,
   `transactionID` CHAR(255) NULL,
   `createdAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ,
   `updatedAt` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
