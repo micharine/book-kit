@@ -48,7 +48,9 @@ mutation{
   createOrder(
     inventoryItemCode: "gen"
     quantityOrdered: 1
-    customerID: "TestCustomer"
+    email: "test@testmyemailstuff.com"
+    firstName: "Bugs"
+    lastName: "Bunny"
     transactionID:"PK_12378"
   )
 }
