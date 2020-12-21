@@ -64,7 +64,7 @@ app.use((req, res, next) => {
     next();
 });
 
-// TODO: consider async/await here
+// TODO: consider async/await here... but, it works for now because of the different resolves.
 const queryDB = (req, sql, args) =>
     new Promise((resolve, reject) => {
         req.mysqlDb.query(sql, args, (err, rows) => {
