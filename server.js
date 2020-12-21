@@ -3,15 +3,15 @@ const { graphqlHTTP } = require('express-graphql');
 const { graphql, buildSchema } = require('graphql');
 const mysql = require('mysql');
 const Stripe = require('stripe');
-const cors = require('cors')
-
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const multer = require('multer');
+const upload = multer();
 const configurator = require('./local');
 let config = configurator.config;
 
-
 // stripe
 const stripe = Stripe(config.stripe.secretkey);
-
 
 // TODO: separate file later and export/import?
 // Make id's id: Int! or !Int? Or something.. Make them required?
@@ -43,11 +43,11 @@ const storeSchema = buildSchema(`
   }
 `);
 
-
 // Standup
 let app = express();
 
 app.use(cors());
+app.use(bodyParser.json());
 
 /* Establish Database Connection */
 app.use((req, res, next) => {
@@ -65,28 +65,42 @@ app.use((req, res, next) => {
 });
 
 // TODO: consider async/await here
-const queryDB = (req, sql, args) => new Promise((resolve, reject) => {
-    req.mysqlDb.query(sql, args, (err, rows) => {
-        if (err)
-            return reject(err);
-        rows.changedRows || rows.affectedRows || rows.insertId ? resolve(true) : resolve(rows);
+const queryDB = (req, sql, args) =>
+    new Promise((resolve, reject) => {
+        req.mysqlDb.query(sql, args, (err, rows) => {
+            if (err) return reject(err);
+            rows.changedRows || rows.affectedRows || rows.insertId
+                ? resolve(true)
+                : resolve(rows);
+        });
     });
-});
 
 const root = {
-  getInventoryItems: (args, req) => queryDB(req, "select * from inventoryitem").then(data => data),
-  getInventoryItemInfo: (args, req) => queryDB(req, "select * from inventoryitem where id = ?", [args.id]).then(data => data[0]),
-  updateInventoryItemQuantity: (args, req) => queryDB(req, "update inventoryitem SET ? where id = ?", [args, args.id]).then(data => data),
-  createOrder: (args, req) => queryDB(req, "insert into order SET ?", args).then(data => data),
-//   deleteInventoryItem: (args, req) => queryDB(req, "delete from inventoryitem where id = ?", [args.id]).then(data => data)
+    getInventoryItems: (args, req) =>
+        queryDB(req, 'select * from inventoryitem').then((data) => data),
+    getInventoryItemInfo: (args, req) =>
+        queryDB(req, 'select * from inventoryitem where id = ?', [
+            args.id,
+        ]).then((data) => data[0]),
+    updateInventoryItemQuantity: (args, req) =>
+        queryDB(req, 'update inventoryitem SET ? where id = ?', [
+            args,
+            args.id,
+        ]).then((data) => data),
+    createOrder: (args, req) =>
+        queryDB(req, 'insert into order SET ?', args).then((data) => data),
+    //   deleteInventoryItem: (args, req) => queryDB(req, "delete from inventoryitem where id = ?", [args.id]).then(data => data)
 };
 
 // Connect graphQL
-app.use('/graphql', graphqlHTTP({
-    schema: storeSchema,
-    rootValue: root,
-    graphiql: true,
-}));
+app.use(
+    '/graphql',
+    graphqlHTTP({
+        schema: storeSchema,
+        rootValue: root,
+        graphiql: true,
+    })
+);
 
 // Test root connection
 app.get('/', (req, res) => {
@@ -94,36 +108,41 @@ app.get('/', (req, res) => {
 });
 
 // items = [{id, cost, quantityOrdered, code},{},...]
-let calculateOrderAmount = (items)=>{
-let amount = 0;
-  items.map((item)=>{
-  let cost = item.cost;
-  let quantity = item.quantityOrdered;
-  amount += (cost*quantity);
-});
-return amount;
+let calculateOrderAmount = (items, currency) => {
+    let itemIds = Object.keys(items);
+    let amount = 0;
+    itemIds.map((id) => {
+        let cost = items[id].cost;
+        let quantity = items[id].quantityOrdered;
+        amount += cost * quantity;
+    });
+    if (currency == 'usd') {
+        amount *= 100; // Convert to cents, since amount must be positive integer representing how much to charge in the smallest currency (cents
+    }
+    return amount;
 };
 
 // Stripe payment intent endpoint
-app.post('/create-payment-intent', async(req, res)=>{
-  let {items, currency} = req.body;
-  // TODO: may hardcode currency to 'usd'
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount: calculateOrderAmount(items),
-    currency: currency,
-    // Verify integration
-    metadata: {integration_check: 'accept_a_payment'},
-  });
-  
-  // Send publishable key and paymentIntent details to client
-  // TODO: may not need publishable key
-res.send({
-  publishableKey: config.stripe.secretkey,
-  clientSecret: paymentIntent.client_secret
-});
+app.post('/create-payment-intent', upload.array(), async (req, res) => {
+    let { items, currency } = req.body;
+    // TODO: may hardcode currency to 'usd'
+    const paymentIntent = await stripe.paymentIntents.create(
+        {
+            amount: calculateOrderAmount(items, currency),
+            currency: currency,
+            // Verify integration
+            metadata: { integration_check: 'accept_a_payment' },
+        },
+        { apiKey: config.stripe.secretKey }
+    );
 
+    // Send publishable key and paymentIntent details to client
+    // TODO: may not need publishable key
+    res.send({
+        publishableKey: config.stripe.secretkey,
+        clientSecret: paymentIntent.client_secret,
+    });
 });
-
 
 let port = 4000;
 app.listen(port);
