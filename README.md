@@ -1,4 +1,4 @@
-# GraphQL API for Book-kit-ui
+# Demo App: GraphQL API for Book-kit-ui
 This is an express-powered GraphQL API that interacts with a MySQL database that contains the inventory and orders list for the Bible Book Club store ([book-kit-ui](https://github.com/micharine/book-kit-ui)). It also uses [Stripe.js](https://stripe.com/docs/stripe-js) to manage payment information. 
 
 To test this locally after cloning, 
