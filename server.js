@@ -139,6 +139,7 @@ app.post('/create-payment-intent', upload.array(), async (req, res) => {
     // Send publishable key and paymentIntent details to client
     // TODO: may not need publishable key
     res.send({
+        // TODO: publishable key instead of secret
         publishableKey: config.stripe.secretkey,
         clientSecret: paymentIntent.client_secret,
     });
