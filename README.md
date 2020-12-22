@@ -1,5 +1,5 @@
-# GraphQL API for Book-kit-ui
-This is an express-powered GraphQL API that interacts with a MySQL database that contains the inventory and orders list for the Bible Book Club Kit store ([book-kit-ui](https://github.com/micharine/book-kit-ui)).
+# Demo App: GraphQL API for Book-kit-ui
+This is an express-powered GraphQL API that interacts with a MySQL database that contains the inventory and orders list for the Bible Book Club store ([book-kit-ui](https://github.com/micharine/book-kit-ui)).
 
 To test this locally after cloning, 
 1. Create or use a MySQL server, connect to it with MySQL Workbench and run the scripts from the [`database`](https://github.com/micharine/book-kit/tree/main/database) folder in a query on your server. 
