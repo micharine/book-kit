@@ -3,13 +3,13 @@ This is an express-powered GraphQL API that interacts with a MySQL database that
 
 To test this locally after cloning, 
 1. Create or use a [Stripe](https://stripe.com/docs/stripe-js) account to get access to the [keys required](https://stripe.com/docs/keys) to connect to Stripe.
-1. Create or use a MySQL server, connect to it with MySQL Workbench and run the scripts from the [`database`](https://github.com/micharine/book-kit/tree/main/database) folder in a query on your server. 
-1. **IMPORTANT**: Rename [`local-temp.js`](https://github.com/micharine/book-kit/blob/stripe/local-temp.js) to `local.js` and fill in with the correct values. This is for storing secret information. `local.js` has been added to the `.gitignore` file so that it will not be pushed.
+1. Create or use a MySQL server, connect to it with MySQL Workbench and run the scripts from the [`database`](https://github.com/micharine/book-kit/tree/stripe/database) folder in a query on your server. 
+1. **IMPORTANT**: Rename [`local-temp.js`](https://github.com/micharine/book-kit/blob/stripe/local-temp.js) to `local.js` and fill in with the correct values. This is for storing secret information. `local.js` has been added to the [`.gitignore`](https://github.com/micharine/book-kit/blob/stripe/.gitignore) file so that it will not be pushed.
 1. from the root directory of this project in a command line, run `npm install`, then  `node server`. 
 1. The graphiQL interface will be served on `localhost:4000/graphQL`. You can simply open it in your browser. 
 
  ## Queries
- The queries are defined in the [`server.js`](https://github.com/micharine/book-kit/blob/main/server.js) file. 
+ The queries are defined in the [`server.js`](https://github.com/micharine/book-kit/blob/stripe/server.js) file. 
  
  Here we have some example queries that can be run in GraphiQL.
  ### Get a list of all items in inventory
